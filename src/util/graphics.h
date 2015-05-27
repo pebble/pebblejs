@@ -38,6 +38,8 @@ static inline void graphics_context_set_alpha_blended(GContext *ctx, bool enable
   }
 }
 
+#if defined(PBL_PLATFORM_BASALT)
+
 static inline bool gbitmap_is_palette_black_and_white(GBitmap *bitmap) {
   if (!bitmap || gbitmap_get_format(bitmap) != GBitmapFormat1BitPalette) {
     return false;
@@ -46,3 +48,5 @@ static inline bool gbitmap_is_palette_black_and_white(GBitmap *bitmap) {
   return (gcolor8_equal(palette[0], GColorWhite) && gcolor8_equal(palette[1], GColorBlack)) ||
          (gcolor8_equal(palette[0], GColorBlack) && gcolor8_equal(palette[1], GColorWhite));
 }
+
+#endif
