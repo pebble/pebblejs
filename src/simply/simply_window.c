@@ -144,6 +144,7 @@ void simply_window_set_fullscreen(SimplyWindow *self, bool is_fullscreen) {
 
 void simply_window_set_background_color(SimplyWindow *self, GColor8 background_color) {
   self->background_color = background_color;
+  window_set_background_color(self->window, gcolor8_get_or(background_color, GColorBlack));
 }
 
 void simply_window_set_action_bar(SimplyWindow *self, bool is_action_bar) {
@@ -279,6 +280,7 @@ void simply_window_load(SimplyWindow *self) {
 
   scroll_layer_set_context(scroll_layer, self);
   scroll_layer_set_shadow_hidden(scroll_layer, true);
+  scroll_layer_set_paging(scroll_layer, PBL_IF_ROUND_ELSE(true, false)); // TODO: Expose this to JS
 
   window_set_click_config_provider_with_context(window, click_config_provider, self);
   simply_window_set_action_bar(self, self->is_action_bar);
