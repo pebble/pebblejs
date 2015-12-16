@@ -42,14 +42,18 @@ main.on('click', 'select', function(e) {
   var wind = new UI.Window({
     fullscreen: true,
   });
-  var textfield = new UI.Text({
-    position: new Vector2(0, 65),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
+  wind.on('load', function(size) {
+    console.log(size.w + 'x' + size.h + ' window loaded!');
+    var textSize = new Vector2(144, 30);
+    var textfield = new UI.Text({
+      position: new Vector2((size.w - textSize.x) / 2, (size.h - textSize.y) / 2),
+      size: textSize,
+      font: 'gothic-24-bold',
+      text: 'Text Centered!',
+      textAlign: 'center'
+    });
+    wind.add(textfield);
   });
-  wind.add(textfield);
   wind.show();
 });
 

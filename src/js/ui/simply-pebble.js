@@ -72,6 +72,21 @@ var SizeType = function(x) {
   this.sizeH(x.y);
 };
 
+var GPoint = new struct([
+  ['int16', 'x'],
+  ['int16', 'y'],
+]);
+
+var GSize = new struct([
+  ['int16', 'w'],
+  ['int16', 'h'],
+]);
+
+var GRect = new struct([
+  [GPoint, 'origin', PositionType],
+  [GSize, 'size', SizeType],
+]);
+
 var hexColorMap = {
   '#000000': 0xC0,
   '#000055': 0xC1,
@@ -504,6 +519,12 @@ var WindowHidePacket = new struct([
   ['uint32', 'id'],
 ]);
 
+var WindowLoadEventPacket = new struct([
+  [Packet, 'packet'],
+  ['uint32', 'id'],
+  [GSize, 'size']
+]);
+
 var WindowShowEventPacket = new struct([
   [Packet, 'packet'],
   ['uint32', 'id'],
@@ -807,6 +828,7 @@ var CommandPackets = [
   WakeupEventPacket,
   WindowShowPacket,
   WindowHidePacket,
+  WindowLoadEventPacket,
   WindowShowEventPacket,
   WindowHideEventPacket,
   WindowPropsPacket,
@@ -1432,6 +1454,9 @@ SimplyPebble.onPacket = function(buffer, offset) {
       ImageService.markAllUnloaded();
       WindowStack.emitHide(packet.id());
       break;
+    case WindowLoadEventPacket:
+      WindowStack.emitLoad(packet.id(), { w: packet.sizeW(), h: packet.sizeH() });
+      break;
     case ClickPacket:
       Window.emitClick('click', ButtonTypes[packet.button()]);
       break;
@@ -1485,4 +1510,3 @@ SimplyPebble.onAppMessage = function(e) {
 };
 
 module.exports = SimplyPebble;
-

@@ -30,6 +30,7 @@ void simply_window_stack_show(SimplyWindowStack *self, SimplyWindow *window, boo
 void simply_window_stack_pop(SimplyWindowStack *self, SimplyWindow *window);
 void simply_window_stack_back(SimplyWindowStack *self, SimplyWindow *window);
 
+void simply_window_stack_send_load(SimplyWindowStack *self, SimplyWindow *window, GSize size);
 void simply_window_stack_send_show(SimplyWindowStack *self, SimplyWindow *window);
 void simply_window_stack_send_hide(SimplyWindowStack *self, SimplyWindow *window);
 

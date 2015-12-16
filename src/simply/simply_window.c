@@ -351,6 +351,10 @@ static void handle_window_props_packet(Simply *simply, Packet *data) {
   simply_window_set_background_color(window, packet->background_color);
   simply_window_set_fullscreen(window, packet->fullscreen);
   simply_window_set_scrollable(window, packet->scrollable);
+
+  Layer *window_layer = window_get_root_layer(window->window);
+  GRect frame = layer_get_frame(window_layer);
+  simply_window_stack_send_load(simply->window_stack, window, frame.size);
 }
 
 static void handle_window_button_config_packet(Simply *simply, Packet *data) {

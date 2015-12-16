@@ -31,14 +31,25 @@ struct __attribute__((__packed__)) WindowShowPacket {
 
 typedef struct WindowSignalPacket WindowSignalPacket;
 
-struct __attribute__((__packed__)) WindowSignalPacket {
-  Packet packet;
-  uint32_t id;
-};
+#define WindowSignalPacketDef { \
+  Packet packet;                \
+  uint32_t id;                  \
+}
+
+struct __attribute__((__packed__)) WindowSignalPacket WindowSignalPacketDef;
 
 typedef WindowSignalPacket WindowHidePacket;
 
 typedef WindowHidePacket WindowEventPacket;
+
+struct __attribute__((__packed__)) WindowLoadEventPacket {
+  union {
+    struct WindowSignalPacketDef;
+  };
+  GSize size;
+};
+
+typedef struct WindowLoadEventPacket WindowLoadEventPacket;
 
 typedef WindowEventPacket WindowShowEventPacket;
 
@@ -46,16 +57,31 @@ typedef WindowEventPacket WindowHideEventPacket;
 
 static bool s_broadcast_window = true;
 
-static bool send_window(SimplyMsg *self, Command type, uint32_t id) {
+static bool send_window_event_packet(SimplyMsg *self, WindowEventPacket* packet) {
   if (!s_broadcast_window) {
     return false;
   }
+  return simply_msg_send_packet(&packet->packet);
+}
+
+#define window_event_packet_field_init(name, packet_type, id) \
+  .packet.type = (packet_type), \
+  .packet.length = sizeof(name), \
+  .id = (id)
+
+static bool send_window(SimplyMsg *self, Command type, uint32_t id) {
   WindowEventPacket packet = {
-    .packet.type = type,
-    .packet.length = sizeof(packet),
-    .id = id,
+    window_event_packet_field_init(packet, type, id),
   };
-  return simply_msg_send_packet(&packet.packet);
+  return send_window_event_packet(self, &packet);
+}
+
+static bool send_window_load(SimplyMsg *self, uint32_t id, GSize size) {
+  WindowLoadEventPacket packet = {
+    window_event_packet_field_init(packet, CommandWindowLoadEvent, id),
+    .size = size,
+  };
+  return send_window_event_packet(self, (WindowEventPacket *) &packet);
 }
 
 static bool send_window_show(SimplyMsg *self, uint32_t id) {
@@ -149,6 +175,12 @@ void simply_window_stack_back(SimplyWindowStack *self, SimplyWindow *window) {
   self->is_hiding = true;
   simply_window_stack_send_hide(self, window);
   self->is_hiding = false;
+}
+
+void simply_window_stack_send_load(SimplyWindowStack *self, SimplyWindow *window, GSize size) {
+  if (window->id) {
+    send_window_load(self->simply->msg, window->id, size);
+  }
 }
 
 void simply_window_stack_send_show(SimplyWindowStack *self, SimplyWindow *window) {

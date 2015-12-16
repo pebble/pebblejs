@@ -19,6 +19,14 @@ WindowStack.prototype.top = function() {
   return util2.last(this._items);
 };
 
+WindowStack.prototype._emitLoad = function(item, size) {
+  item._emitLoad('load', size);
+  var e = {
+    window: item
+  };
+  this.emit('load', e);
+};
+
 WindowStack.prototype._emitShow = function(item) {
   item.forEachListener(item.onAddHandler);
   item._emitShow('show');
@@ -114,6 +122,11 @@ WindowStack.prototype.emitHide = function(windowId) {
   var wind = this.get(windowId);
   if (wind !== this.top()) { return; }
   this.remove(wind);
+};
+
+WindowStack.prototype.emitLoad = function(windowId, size) {
+  var wind = this.get(windowId);
+  this._emitLoad(wind, size);
 };
 
 WindowStack.prototype._toString = function() {
