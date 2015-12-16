@@ -602,6 +602,20 @@ You can register a handler for the 'up', 'select', 'down', and 'back' buttons.
 
 Just like `Window.on('click', button, handler)` but for 'longClick' events.
 
+#### Window.on('load', handler(GSize))
+
+Registers a handler to call when the window is loaded, identified, and size information is available. This is useful for positioning UI relative to screen boundaries.
+
+````js
+// Define the handler before showing.
+wind.on('load', function(size) {
+  console.log(size.w + 'x' + size.h + ' window loaded!');
+});
+
+// The load event will emit, and the handler will be called.
+wind.show();
+````
+
 #### Window.on('show', handler)
 
 Registers a handler to call when the window is shown. This is useful for knowing when a user returns to your window from another. This event is also emitted when programmatically showing the window. This does not include when a Pebble notification popup is exited, revealing your window.

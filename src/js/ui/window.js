@@ -276,6 +276,10 @@ Window.prototype._emit = function(type, subtype, e) {
   }
 };
 
+Window.prototype._emitLoad = function(type, size) {
+  return this._emit(type, null, size);
+};
+
 Window.prototype._emitShow = function(type) {
   return this._emit(type, null, {});
 };

@@ -12,6 +12,7 @@ enum Command {
   CommandWakeupEvent,
   CommandWindowShow,
   CommandWindowHide,
+  CommandWindowLoadEvent,
   CommandWindowShowEvent,
   CommandWindowHideEvent,
   CommandWindowProps,
