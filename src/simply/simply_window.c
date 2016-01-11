@@ -23,6 +23,8 @@ struct __attribute__((__packed__)) WindowPropsPacket {
   GColor8 background_color;
   bool fullscreen;
   bool scrollable;
+  GColor8 status_background_color;
+  GColor8 status_text_color;
 };
 
 typedef struct WindowButtonConfigPacket WindowButtonConfigPacket;
@@ -349,6 +351,8 @@ static void handle_window_props_packet(Simply *simply, Packet *data) {
   }
   window->id = packet->id;
   simply_window_set_background_color(window, packet->background_color);
+  status_bar_layer_set_colors(window->status_bar_layer, packet->status_background_color,
+  			      packet->status_text_color);
   simply_window_set_fullscreen(window, packet->fullscreen);
   simply_window_set_scrollable(window, packet->scrollable);
 }

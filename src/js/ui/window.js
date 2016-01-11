@@ -49,6 +49,8 @@ var defaults = {
   backgroundColor: 'black',
   fullscreen: false,
   scrollable: false,
+  statusBackgroundColor: 'black',
+  statusTextColor: 'white',
 };
 
 var nextId = 1;

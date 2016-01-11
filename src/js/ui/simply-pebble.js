@@ -520,6 +520,8 @@ var WindowPropsPacket = new struct([
   ['uint8', 'backgroundColor', Color],
   ['bool', 'fullscreen', BoolType],
   ['bool', 'scrollable', BoolType],
+  ['uint8', 'statusBackgroundColor', Color],
+  ['uint8', 'statusTextColor', Color],
 ]);
 
 var WindowButtonConfigPacket = new struct([
