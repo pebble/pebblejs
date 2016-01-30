@@ -7,6 +7,7 @@ typedef struct Simply Simply;
 struct Simply {
   struct SimplyAccel *accel;
   struct SimplyVoice *voice;
+  struct SimplyUserData *user_data;
   struct SimplyRes *res;
   struct SimplyMsg *msg;
   struct SimplyWindowStack *window_stack;
