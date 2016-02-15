@@ -3,25 +3,25 @@
   "capabilities": [
     "configurable"
   ],
-  "companyName": "Meiguro",
-  "longName": "Pebble.js",
+  "companyName": "Yaoyu Yang",
+  "longName": "CatchOneBus",
   "resources": {
     "media": [
       {
         "file": "images/menu_icon.png",
         "menuIcon": true,
         "name": "IMAGE_MENU_ICON",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "images/logo_splash.png",
         "name": "IMAGE_LOGO_SPLASH",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "images/tile_splash.png",
         "name": "IMAGE_TILE_SPLASH",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "fonts/UbuntuMono-Regular.ttf",
@@ -31,15 +31,14 @@
     ]
   },
   "sdkVersion": "3",
-  "shortName": "Pebble.js",
+  "shortName": "CatchOneBus",
   "targetPlatforms": [
     "aplite",
-    "basalt",
-    "chalk"
+    "basalt"
   ],
-  "uuid": "133215f0-cf20-4c05-997b-3c9be5a64e5b",
+  "uuid": "775e3188-b4f2-4e4b-836a-e02080705ddf",
   "versionCode": 1,
-  "versionLabel": "0.4",
+  "versionLabel": "1.8",
   "watchapp": {
     "watchface": false
   }
