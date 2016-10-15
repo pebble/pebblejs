@@ -14,5 +14,6 @@ UI.Image = require('ui/image');
 UI.Inverter = require('ui/inverter');
 UI.Vibe = require('ui/vibe');
 UI.Light = require('ui/light');
+UI.Path = require('ui/path');
 
 module.exports = UI;

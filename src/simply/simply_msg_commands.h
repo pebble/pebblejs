@@ -55,6 +55,7 @@ enum Command {
   CommandElementImage,
   CommandElementAnimate,
   CommandElementAnimateDone,
+  CommandElementPath,
   CommandVoiceStart,
   CommandVoiceStop,
   CommandVoiceData,

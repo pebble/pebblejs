@@ -31,6 +31,7 @@ enum SimplyElementType {
   SimplyElementTypeText,
   SimplyElementTypeImage,
   SimplyElementTypeInverter,
+  SimplyElementTypePath,
 };
 
 struct SimplyStageLayer {
@@ -111,6 +112,13 @@ struct SimplyAnimation {
   PropertyAnimation *animation;
   uint32_t duration;
   AnimationCurve curve;
+};
+
+typedef struct SimplyElementPath SimplyElementPath;
+
+struct SimplyElementPath {
+  SimplyElementCommon common;
+  GPath* path;
 };
 
 SimplyStage *simply_stage_create(Simply *simply);
