@@ -38,6 +38,7 @@ var Types = [
   'TextType',
   'ImageType',
   'InverterType',
+  'PathType'
 ];
 
 Types.forEach(function(name, index) {

@@ -76,6 +76,11 @@ var SizeType = function(x) {
   this.sizeH(x.y);
 };
 
+var VectorType = function(vector, field) {
+  this[field + 'X'](vector.x);
+  this[field + 'Y'](vector.y);
+};
+
 var namedColorMap = {
   'clear': 0x00,
   'black': 0xC0,
@@ -732,6 +737,17 @@ var ElementAnimateDonePacket = new struct([
   ['uint32', 'id'],
 ]);
 
+var ElementPathPacket = new struct([
+  [Packet, 'packet'],
+  ['uint32', 'id'],
+  ['int32', 'rotation'],
+  [GPoint, 'offset', VectorType],
+  [GPoint, 'p0', VectorType],
+  [GPoint, 'p1', VectorType],
+  [GPoint, 'p2', VectorType],
+  [GPoint, 'p3', VectorType],
+]);
+
 var VoiceDictationStartPacket = new struct([
   [Packet, 'packet'],
   ['bool', 'enableConfirmation'],
@@ -801,6 +817,7 @@ var CommandPackets = [
   ElementImagePacket,
   ElementAnimatePacket,
   ElementAnimateDonePacket,
+  ElementPathPacket,
   VoiceDictationStartPacket,
   VoiceDictationStopPacket,
   VoiceDictationDataPacket,
@@ -1305,6 +1322,19 @@ SimplyPebble.elementAnimate = function(id, def, animateDef, duration, easing) {
   SimplyPebble.sendPacket(ElementAnimatePacket);
 };
 
+SimplyPebble.elementPath = function(id, def) {
+  ElementPathPacket
+    .id(id)
+    .p0(def.p0)
+    .p1(def.p1)
+    .p2(def.p2)
+    .p3(def.p3)
+    .rotation(def.rotation)
+    .offset(def.offset || { x: 0, y: 0 })
+    .prop(def);
+  SimplyPebble.sendPacket(ElementPathPacket);
+};
+
 SimplyPebble.stageClear = function() {
   SimplyPebble.sendPacket(StageClearPacket);
 };
@@ -1332,6 +1362,9 @@ SimplyPebble.stageElement = function(id, type, def, index) {
     case StageElement.ImageType:
       SimplyPebble.elementRadius(id, def);
       SimplyPebble.elementImage(id, def.image, def.compositing);
+      break;
+    case StageElement.PathType:
+      SimplyPebble.elementPath(id, def);
       break;
   }
 };

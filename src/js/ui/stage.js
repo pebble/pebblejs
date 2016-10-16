@@ -9,11 +9,13 @@ var Stage = function(stageDef) {
 };
 
 Stage.RectType = 1;
-Stage.CircleType = 2;
-Stage.RadialType = 6;
-Stage.TextType = 3;
-Stage.ImageType = 4;
-Stage.InverterType = 5;
+Stage.LineType = 2;
+Stage.CircleType = 3;
+Stage.RadialType = 4;
+Stage.TextType = 4;
+Stage.ImageType = 5;
+Stage.InverterType = 6;
+Stage.PathType = 7;
 
 util2.copy(Emitter.prototype, Stage.prototype);
 

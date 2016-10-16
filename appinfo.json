@@ -11,17 +11,17 @@
         "file": "images/menu_icon.png",
         "menuIcon": true,
         "name": "IMAGE_MENU_ICON",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "images/logo_splash.png",
         "name": "IMAGE_LOGO_SPLASH",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "images/tile_splash.png",
         "name": "IMAGE_TILE_SPLASH",
-        "type": "bitmap"
+        "type": "png"
       },
       {
         "file": "fonts/UbuntuMono-Regular.ttf",

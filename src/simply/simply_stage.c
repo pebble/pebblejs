@@ -111,6 +111,19 @@ struct __attribute__((__packed__)) ElementAnimateDonePacket {
   uint32_t id;
 };
 
+typedef struct ElementPathPacket ElementPathPacket;
+
+struct __attribute__((__packed__)) ElementPathPacket {
+  Packet packet;
+  uint32_t id;
+  int32_t rotation;
+  GPoint offset;
+  GPoint p0;
+  GPoint p1;
+  GPoint p2;
+  GPoint p3;
+};
+
 static void simply_stage_clear(SimplyStage *self);
 
 static void simply_stage_update(SimplyStage *self);
@@ -156,6 +169,15 @@ static void destroy_element(SimplyStage *self, SimplyElementCommon *element) {
       break;
     case SimplyElementTypeInverter:
       inverter_layer_destroy(((SimplyElementInverter*) element)->inverter_layer);
+      break;
+    case SimplyElementTypePath:
+      if (((SimplyElementPath*) element)->path) {
+        if (((SimplyElementPath*) element)->path->points) {
+          free(((SimplyElementPath*) element)->path->points);
+          ((SimplyElementPath*) element)->path->points = NULL;
+        }
+        gpath_destroy(((SimplyElementPath*) element)->path);
+      }
       break;
   }
   free(element);
@@ -289,6 +311,17 @@ static void image_element_draw(GContext *ctx, SimplyStage *self, SimplyElementIm
   graphics_context_set_compositing_mode(ctx, GCompOpAssign);
 }
 
+static void path_element_draw(GContext *ctx, SimplyStage *self, SimplyElementPath *element) {
+  if (element->path && element->common.background_color.a) {
+    graphics_context_set_fill_color(ctx, gcolor8_get(element->common.background_color));
+    gpath_draw_filled(ctx, element->path);
+  }
+  if (element->path && element->common.border_color.a) {
+    graphics_context_set_stroke_color(ctx, gcolor8_get(element->common.border_color));
+    gpath_draw_outline(ctx, element->path);
+  }
+}
+
 static void layer_update_callback(Layer *layer, GContext *ctx) {
   SimplyStage *self = *(void**) layer_get_data(layer);
 
@@ -332,6 +365,9 @@ static void layer_update_callback(Layer *layer, GContext *ctx) {
         break;
       case SimplyElementTypeInverter:
         break;
+      case SimplyElementTypePath:
+        path_element_draw(ctx, self, (SimplyElementPath*) element);
+        break;
     }
     element = (SimplyElementCommon*) element->node.next;
   }
@@ -356,6 +392,7 @@ static size_t prv_get_element_size(SimplyElementType type) {
     case SimplyElementTypeText: return sizeof(SimplyElementText);
     case SimplyElementTypeImage: return sizeof(SimplyElementImage);
     case SimplyElementTypeInverter: return sizeof(SimplyElementInverter);
+    case SimplyElementTypePath: return sizeof(SimplyElementPath);
   }
   return 0;
 }
@@ -596,6 +633,7 @@ static void handle_element_remove_packet(Simply *simply, Packet *data) {
     return;
   }
   simply_stage_remove_element(simply->stage, element);
+  destroy_element(simply->stage, element);
   simply_stage_update(simply->stage);
 }
 
@@ -703,6 +741,38 @@ static void handle_element_animate_packet(Simply *simply, Packet *data) {
   simply_stage_animate_element(simply->stage, element, animation, packet->frame);
 }
 
+static void handle_element_path_packet(Simply *simply, Packet *data) {
+  GPathInfo pathInfo;
+  GPath *path;
+
+  ElementPathPacket *packet = (ElementPathPacket*) data;
+  SimplyElementPath *element = (SimplyElementPath*) simply_stage_get_element(simply->stage, packet->id);
+  if (!element) {
+    return;
+  }
+  pathInfo.num_points = 4;
+  pathInfo.points = malloc0(4 * sizeof(GPoint));
+  if (pathInfo.points) {
+    memcpy(pathInfo.points, &packet->p0, 4 * sizeof(GPoint));
+    path = gpath_create(&pathInfo);
+    if (path) {
+      if (element->path) {
+        if (element->path->points) {
+          free(element->path->points);
+          element->path->points = NULL;
+        }
+        gpath_destroy(element->path);
+      }
+      element->path = path;
+      gpath_move_to(element->path, packet->offset);
+      gpath_rotate_to(element->path, packet->rotation);
+      simply_stage_update(simply->stage);
+    } else {
+     free(pathInfo.points);
+    }
+  }
+}
+
 bool simply_stage_handle_packet(Simply *simply, Packet *packet) {
   switch (packet->type) {
     case CommandStageClear:
@@ -737,6 +807,9 @@ bool simply_stage_handle_packet(Simply *simply, Packet *packet) {
       return true;
     case CommandElementAnimate:
       handle_element_animate_packet(simply, packet);
+      return true;
+    case CommandElementPath:
+      handle_element_path_packet(simply, packet);
       return true;
   }
   return false;

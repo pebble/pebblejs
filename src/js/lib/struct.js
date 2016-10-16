@@ -171,8 +171,8 @@ struct.prototype._makeAccessor = function(field) {
 };
 
 struct.prototype._makeMetaAccessor = function(name, transform) {
-  this[name] = function(value, field) {
-    transform.call(this, value, field);
+  this[name] = function(value) {
+    transform.call(this, value, name);
     return this;
   };
 };
