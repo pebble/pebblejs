@@ -633,6 +633,7 @@ static void handle_element_remove_packet(Simply *simply, Packet *data) {
     return;
   }
   simply_stage_remove_element(simply->stage, element);
+  destroy_element(simply->stage, element);
   simply_stage_update(simply->stage);
 }
 
