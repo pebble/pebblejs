@@ -779,6 +779,50 @@ SimplyRocky.init = function() {
 
   state.timeOffset = new Date().getTimezoneOffset() * -60;
 
+  var clickStartTime, clickEndTime, longPress;
+  ButtonTypes.forEach(function(button) {
+    document.getElementById(button).onclick = function() {
+      var clickType;
+      if (WindowStack.top() instanceof Menu) {
+        var menu = WindowStack.top();
+        switch (button) {
+          case "select":
+                return Menu.emitSelect(longPress ? 'menuLongSelect' : 'menuSelect', menu._selection.sectionIndex,  menu._selection.itemIndex);
+          case "up":
+                menu._selection.itemIndex > 0 ? menu._selection.itemIndex-- : null;
+                SimplyRocky.stageClear();
+                SimplyRocky.menuSelection(menu._selection.sectionIndex, menu._selection.itemIndex);
+                SimplyRocky.markDirty();
+                return;
+          case "down":
+                var itemsLength = menu.state.sections[ menu._selection.sectionIndex].items.length;
+                menu._selection.itemIndex < itemsLength-1 ? menu._selection.itemIndex++ : null;
+                SimplyRocky.stageClear();
+                SimplyRocky.menuSelection(menu._selection.sectionIndex, menu._selection.itemIndex);
+                SimplyRocky.markDirty();
+                return;
+        }
+
+      } else {
+        Window.emitClick(longPress ? 'longClick' : 'click', button);
+      }
+
+    };
+
+
+    document.getElementById(button).onmousedown = function () {
+      clickStartTime = new Date().getTime();
+    };
+
+    document.getElementById(button).onmouseup = function () {
+      clickEndTime = new Date().getTime();
+      longPress = (clickEndTime - clickStartTime < 1000) ? false : true;
+    };
+
+  });
+
+
+
   // Signal the Pebble that the Phone's app message is ready
   SimplyRocky.ready();
 };
@@ -1116,7 +1160,10 @@ SimplyRocky.onVoiceData = function(packet) {
 };
 
 SimplyRocky.menuClear = function() {
-  //SimplyRocky.sendPacket(MenuClearPacket);
+  SimplyRocky.menuState = {
+    currentMenuItems : []
+  };
+  SimplyRocky.stageClear();
 };
 
 SimplyRocky.menuClearSection = function(section) {
@@ -1126,7 +1173,6 @@ SimplyRocky.menuClearSection = function(section) {
 
 SimplyRocky.menuProps = function(def) {
   MenuPropsPacket.prop(def);
-  //SimplyRocky.sendPacket(MenuPropsPacket.prop(def));
 };
 
 SimplyRocky.menuSection = function(section, def, clear) {
@@ -1141,6 +1187,8 @@ SimplyRocky.menuSection = function(section, def, clear) {
     .titleLength(def.title)
     .title(def.title);
   //SimplyRocky.sendPacket(MenuSectionPacket);
+
+  SimplyRocky.menuState.currentMenuItems = def.items;
 };
 
 SimplyRocky.menuItem = function(section, item, def) {
@@ -1153,15 +1201,79 @@ SimplyRocky.menuItem = function(section, item, def) {
     .title(def.title)
     .subtitle(def.subtitle);
   //SimplyRocky.sendPacket(MenuItemPacket);
+
+  SimplyRocky.menuState.currentMenuItems[item] = def;
 };
 
-SimplyRocky.menuSelection = function(section, item, align) {
-  if (section === undefined) {
-    SimplyRocky.sendPacket(MenuGetSelectionPacket);
-    return;
+SimplyRocky.menuSelection = function(section, selectedItem, align) {
+
+  var renderWindow = SimplyRocky.menuState.currentRenderWindow || new Vector2(0, 3);
+  var maxRenderIndex = SimplyRocky.menuState.currentMenuItems.length;
+
+  if (selectedItem < renderWindow.x) {
+    renderWindow = new Vector2(selectedItem, Math.min(maxRenderIndex, selectedItem + 3));
   }
-  MenuSelectionPacket.section(section).item(item).align(align || 'center');
-  //SimplyRocky.sendPacket(MenuSelectionPacket.section(section).item(item).align(align || 'center'));
+  if (selectedItem > renderWindow.y) {
+    renderWindow = new Vector2(selectedItem - 3, selectedItem);
+  }
+  SimplyRocky.menuState.currentRenderWindow = renderWindow;
+
+  for(var item = renderWindow.x; item <= renderWindow.y; item++) {
+    var def = SimplyRocky.menuState.currentMenuItems[item];
+    var isSelected = item == selectedItem;
+    var renderAt = item - renderWindow.x;
+
+    var MENU_HEIGHT = 168 / 4;
+    var PADDING = 10;
+    var outer = {
+      backgroundColor : 'black',
+      position : {
+        x : 0,
+        y : (MENU_HEIGHT * renderAt)
+      },
+      size : {
+        x : 143,
+        y : MENU_HEIGHT
+      }
+    };
+    SimplyRocky.drawShape(outer);
+
+    var inner = {
+      backgroundColor : isSelected ? 'black' : 'white',
+      position : {
+        x : 1,
+        y : (MENU_HEIGHT * renderAt)
+      },
+      size : {
+        x : 143 - 2,
+        y : MENU_HEIGHT - 1
+      }
+    };
+
+    if ( renderAt == 0) {
+      //special rendering for the first
+      inner.position.y++;
+      inner.size.y--;
+    }
+
+    SimplyRocky.drawShape(inner);
+
+    var textDef = {
+      text : def.title,
+      font : "gothic-18",
+      color : isSelected ? 'white' : 'black',
+      textAlign : "left",
+      position : {
+        x : PADDING,
+        y : outer.position.y + PADDING
+      },
+      size : {
+        x : outer.size.x - PADDING - PADDING,
+        y : outer.size.y - PADDING - PADDING,
+      }
+    };
+    SimplyRocky.drawText(textDef);
+  }
 };
 
 SimplyRocky.menu = function(def, clear, pushing) {
@@ -1241,6 +1353,9 @@ SimplyRocky.elementTextStyle = function(id, def) {
   //SimplyRocky.sendPacket(ElementTextStylePacket)
 };
 
+SimplyRocky._padLeft = function(n) {
+  return n < 9 ? "0" + n : n;
+}
 SimplyRocky.drawText = function(def) {
 
   if (def.updateTimeUnits) {
@@ -1249,13 +1364,13 @@ SimplyRocky.drawText = function(def) {
       var date = new Date();
       var dateValue = [];
       if (def.updateTimeUnits.hours) {
-        dateValue.push(date.getHours());
+        dateValue.push(SimplyRocky._padLeft(date.getHours()));
       }
       if (def.updateTimeUnits.minutes) {
-        dateValue.push(date.getMinutes());
+        dateValue.push(SimplyRocky._padLeft(date.getMinutes()));
       }
       if (def.updateTimeUnits.seconds) {
-        dateValue.push(date.getSeconds);
+        dateValue.push(SimplyRocky._padLeft(date.getSeconds));
       }
 
       def.text = dateValue.join(":");
@@ -1323,7 +1438,7 @@ SimplyRocky.elementAnimate = function(id, def, animateDef, duration, easing) {
 };
 
 SimplyRocky.stageClear = function() {
-  //SimplyRocky.sendPacket(StageClearPacket);
+  theStage.length = 0;
 };
 
 SimplyRocky.stageElement = function(id, type, def, index) {
@@ -1361,14 +1476,15 @@ SimplyRocky.stageRemove = SimplyRocky.elementRemove;
 SimplyRocky.stageAnimate = SimplyRocky.elementAnimate;
 
 SimplyRocky.stage = function(def, clear, pushing) {
+  if (clear !== undefined) {
+    SimplyRocky.stageClear();
+  }
+
   if (arguments.length === 3) {
     SimplyRocky.windowShow({ type: 'window', pushing: pushing });
   }
   SimplyRocky.windowProps(def);
   SimplyRocky.windowStatusBarCompat(def);
-  if (clear !== undefined) {
-    SimplyRocky.stageClear();
-  }
   if (def.action !== undefined) {
     SimplyRocky.windowActionBar(def.action);
   }
