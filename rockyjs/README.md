@@ -3,7 +3,7 @@ Pebble.js + Rocky.js
 
 Pebble.js development in a browser!
 
-Given that Rocky.js provides the Pebble API implemented in javascript, we can now combine Pebble.js and Rocky.js and develop in the web browser with all the javascript development tools.
+Given that Rocky.js provides the Pebble API implemented in javascript, we can now combine Pebble.js and Rocky.js and develop in the web browser with all the javascript development tools - debugging, profiling etc
 
 ## Work in Progress
 
@@ -13,12 +13,11 @@ This is a currently a Proof of Concept with minimal implementataion for the foll
 * `rect`
 * `text` - inlcuding fonts
 * `texttime`
+* `menu`s
 
 It works by replacing `simply-pebble.js` with `simply-rocky.js` at build time. There is some leakage to other classes, for example `Simply.markDirty()` has been added and called from `Window` to optimize the screen redraws.
 
 `simply-rocky.js` is a copy and paste of `simply-pebble.js`. In time all the `simply-pebble.js` hangover code will be removed and replace with the Rocky implementation.
-
-There is limited support.
 
 ## Getting Started
 
