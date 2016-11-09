@@ -801,10 +801,17 @@ SimplyRocky.init = function() {
                 SimplyRocky.menuSelection(menu._selection.sectionIndex, menu._selection.itemIndex);
                 SimplyRocky.markDirty();
                 return;
+          case "back":
+                return SimplyRocky.menuRemove();
+
         }
 
       } else {
-        Window.emitClick(longPress ? 'longClick' : 'click', button);
+        var handled = Window.emitClick(longPress ? 'longClick' : 'click', button);
+        if ( button == "back" && !handled) {
+          WindowStack.remove(WindowStack.top());
+        }
+        SimplyRocky.markDirty();
       }
 
     };
@@ -1207,8 +1214,8 @@ SimplyRocky.menuItem = function(section, item, def) {
 
 SimplyRocky.menuSelection = function(section, selectedItem, align) {
 
-  var renderWindow = SimplyRocky.menuState.currentRenderWindow || new Vector2(0, 3);
-  var maxRenderIndex = SimplyRocky.menuState.currentMenuItems.length;
+  var maxRenderIndex = Math.min(SimplyRocky.menuState.currentMenuItems.length - 1, 3);
+  var renderWindow = SimplyRocky.menuState.currentRenderWindow || new Vector2(0, maxRenderIndex);
 
   if (selectedItem < renderWindow.x) {
     renderWindow = new Vector2(selectedItem, Math.min(maxRenderIndex, selectedItem + 3));
@@ -1287,6 +1294,11 @@ SimplyRocky.menu = function(def, clear, pushing) {
   SimplyRocky.windowStatusBarCompat(def);
   SimplyRocky.menuProps(def);
 };
+
+SimplyRocky.menuRemove = function() {
+  WindowStack.pop();
+  SimplyRocky.markDirty();
+}
 
 SimplyRocky.elementInsert = function(def, id, type, index) {
   //SimplyRocky.sendPacket(ElementInsertPacket.id(id).type(type).index(index));
