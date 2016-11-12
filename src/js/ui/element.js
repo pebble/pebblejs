@@ -93,14 +93,15 @@ StageElement.prototype.animate = function(field, value, duration) {
     this._animate(animateDef, duration);
     util2.copy(animateDef, this.state);
   });
-  if (!this.state.animating) {
-    this.dequeue();
-  }
   return this;
 };
 
 StageElement.prototype.queue = function(callback) {
   this._queue.push(callback);
+  if (!this.state.animating) {
+    this.dequeue();
+  }
+  return this;
 };
 
 StageElement.prototype.dequeue = function() {
