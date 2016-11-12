@@ -1,9 +1,9 @@
 'use strict';
 
 var gulp = require('gulp');
-var rimraf = require('gulp-rimraf');
+var del = require('del');
 
 // Clean
 gulp.task('clean', function () {
-    return gulp.src(['.tmp', 'dist/styles', 'dist/scripts', 'dist/images'], {read: false}).pipe(rimraf());
+    return gulp.src(['.tmp'], {read: false}).pipe(del());
 });

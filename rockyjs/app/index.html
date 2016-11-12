@@ -7,19 +7,30 @@
 </head>
 
 <body>
+    <script src="rocky-0.3.0.js"></script>
+    <canvas id="pebble" class="rocky" width="144" height="168"></canvas>
+    <div id="buttons">
+      <button id="back">BACK</button>
+      <button id="up">UP</button>
+      <button id="select">SELECT</button>
+      <button id="down">Down</button>
+    </div>
+
     <script>
       var Pebble = {
-        addEventListener : function() {},
-        sendAppMessage : function() {},
+          addEventListener : function() {},
+          sendAppMessage : function() {},
 
-        platform : 'pypkjs'
+          platform : 'pypkjs',
+          getActiveWatchInfo : function() {
+            return {
+              platform : 'basalt'
+            }
+          }
       };
 
     </script>
-    <script src="rocky-0.3.0.js"></script>
-    <canvas id="pebble" class="rocky" width="144" height="168"></canvas>
     <script src="scripts/rocky.js"></script>
-
 </body>
 
 </html>
