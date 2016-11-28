@@ -59,4 +59,5 @@ enum Command {
   CommandVoiceStop,
   CommandVoiceData,
   NumCommands,
+  CommandUserData,
 };

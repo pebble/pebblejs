@@ -2,6 +2,7 @@
 
 #include "simply_accel.h"
 #include "simply_voice.h"
+#include "simply_user_data.h"
 #include "simply_res.h"
 #include "simply_stage.h"
 #include "simply_menu.h"
@@ -203,6 +204,7 @@ static void handle_packet(Simply *simply, Packet *packet) {
   if (simply_ui_handle_packet(simply, packet)) { return; }
   if (simply_accel_handle_packet(simply, packet)) { return; }
   if (simply_voice_handle_packet(simply, packet)) { return; }
+  if (simply_user_data_handle_packet(simply, packet)) { return; }
   if (simply_menu_handle_packet(simply, packet)) { return; }
   if (simply_stage_handle_packet(simply, packet)) { return; }
 }
