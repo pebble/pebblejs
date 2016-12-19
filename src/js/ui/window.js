@@ -116,6 +116,7 @@ Window.prototype._show = function(pushing) {
 
 Window.prototype.show = function() {
   WindowStack.push(this);
+  simply.impl.markDirty();
   return this;
 };
 
@@ -279,9 +280,7 @@ Window.prototype._emit = function(type, subtype, e) {
   if (klass) {
     e[klass._codeName] = this;
   }
-  if (this.emit(type, subtype, e) === false) {
-    return false;
-  }
+  return !!this.emit(type, subtype, e);
 };
 
 Window.prototype._emitShow = function(type) {
