@@ -15,6 +15,11 @@ var Vibe = require('ui/vibe');
 
 var simply = {};
 
+/**
+ * Displays text on the Pebble.
+ * @memberOf simply
+ * @param {string} textDef - Text to display on the Pebble.
+ */
 simply.text = function(textDef) {
   var wind = WindowStack.top();
   if (!wind || !(wind instanceof Card)) {
