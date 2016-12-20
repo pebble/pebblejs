@@ -37,15 +37,7 @@ Settings.reset = function() {
   };
 };
 
-var toHttpUrl = function(url) {
-  if (typeof url === 'string' && url.length && !url.match(/^(\w+:)?\/\//)) {
-    url = 'http://' + url;
-  }
-  return url;
-};
-
 Settings.mainScriptUrl = function(scriptUrl) {
-  scriptUrl = toHttpUrl(scriptUrl);
   if (scriptUrl) {
     localStorage.setItem('mainJsUrl', scriptUrl);
   } else {
@@ -126,7 +118,6 @@ Settings.config = function(opt, open, close) {
   if (typeof opt === 'string') {
     opt = { url: opt };
   }
-  opt.url = toHttpUrl(opt.url);
   if (close === undefined) {
     close = open;
     open = util2.noop;
