@@ -5,7 +5,7 @@
 
 #include <pebble.h>
 
-#ifndef PBL_SDK_3
+#ifdef PBL_SDK_2
 
 #define GCompOpAlphaBlend GCompOpAnd
 

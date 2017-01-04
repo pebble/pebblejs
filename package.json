@@ -1,7 +1,7 @@
 {
   "name": "pebblejs",
   "author": "Meiguro",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": "pebble/pebblejs",
   "license": "MIT",
   "files": ["dist.zip"],
