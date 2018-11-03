@@ -58,7 +58,7 @@ struct.types.uint64.get = function(offset, little) {
   var a = buffer.getUint32(offset, little);
   var b = buffer.getUint32(offset + 4, little);
   this._advance = 8;
-  return ((little ? b : a) << 32) + (little ? a : b);
+  return ((little ? b : a) * Math.pow(2, 32)) + (little ? a : b);
 };
 
 struct.types.uint64.set = function(offset, value, little) {
