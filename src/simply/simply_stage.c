@@ -455,6 +455,10 @@ static void animation_stopped(Animation *base_animation, bool finished, void *co
   send_animate_element_done(self->window.simply->msg, element->id);
 }
 
+void animation_destroy_noret(Animation *animation) {
+  animation_destroy(animation);
+}
+
 SimplyAnimation *simply_stage_animate_element(SimplyStage *self,
     SimplyElementCommon *element, SimplyAnimation* animation, GRect to_frame) {
   if (!animation) {
@@ -472,7 +476,7 @@ SimplyAnimation *simply_stage_animate_element(SimplyStage *self,
   static const PropertyAnimationImplementation implementation = {
     .base = {
       .update = (AnimationUpdateImplementation) property_animation_update_grect,
-      .teardown = (AnimationTeardownImplementation) animation_destroy,
+      .teardown = (AnimationTeardownImplementation) animation_destroy_noret,
     },
     .accessors = {
       .setter = { .grect = (const GRectSetter) element_frame_setter },
